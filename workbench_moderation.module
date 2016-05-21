@@ -58,6 +58,8 @@ function workbench_moderation_node_current_draft_load($nid) {
  *
  * This is the access callback for node/%node/draft as defined in
  * workbench_moderation_menu().
+ * The user has access if the loaded node is the active revision and the active
+ * revision isn't the published one.
  *
  * @param int $node
  *   The node being acted upon.
@@ -68,9 +70,12 @@ function workbench_moderation_node_current_draft_load($nid) {
 function _workbench_moderation_access_current_draft($node) {
 
   $active_id = state_flow_entity_get_active_revision_id($node, 'node');
-  // @todo, Add test for when active_id is empty. This occurs when a node is
-  // created before this module is created.
-  if (empty($active_id) || $active_id == $node->vid) {
+  $machine = state_flow_entity_load_state_machine($node, 'node');
+  // Empty active ID means that it is a node that never before was handled by
+  // moderation so it's most likely an published version and not a draft.
+  // If the loaded node has't the same revision id as the active revision id we
+  // skip further checks too.
+  if (empty($active_id) || $machine->isActivePublishedRevision()) {
     return FALSE;
   }
 
