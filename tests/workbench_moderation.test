@@ -30,7 +30,8 @@ class WorkbenchModerationWebTestCase extends DrupalWebTestCase {
       'use workbench_moderation needs review tab',
       'administer_workbench_workflows',
       'access administration pages',
-      'administer site configuration'
+      'administer site configuration',
+      'administer content revisions',
     );
     $web_user = $this->drupalCreateUser($permissions);
     $this->drupalLogin($web_user);
@@ -113,7 +114,7 @@ class WorkbenchModerationWebTestCase extends DrupalWebTestCase {
     $this->assertResponse(403, 'View Draft tab responds with 403 to anonymous user');
 
     // Log in again.
-    $web_user = $this->drupalCreateUser(array('administer nodes', 'bypass node access'));
+    $web_user = $this->drupalCreateUser(array('administer nodes', 'bypass node access', 'administer content revisions'));
     $this->drupalLogin($web_user);
 
     // Set the node to published.
@@ -142,7 +143,7 @@ class WorkbenchModerationWebTestCase extends DrupalWebTestCase {
     $this->assertResponse(403, 'View Draft tab responds with 403 to anonymous user');
 
     // Log in again.
-    $web_user = $this->drupalCreateUser(array('administer nodes', 'bypass node access'));
+    $web_user = $this->drupalCreateUser(array('administer nodes', 'bypass node access', 'administer content revisions'));
     $this->drupalLogin($web_user);
 
     // Edit the node, creating a new title, set to needs review.
