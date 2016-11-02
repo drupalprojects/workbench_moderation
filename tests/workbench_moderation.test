@@ -10,7 +10,7 @@ class WorkbenchModerationTestCase extends DrupalWebTestCase {
   protected $moderator_user;
 
   function setUp($modules = array()) {
-    $modules = array_merge($modules, array('workbench_moderation', 'workbench_moderation_test'));
+    $modules = array_merge($modules, array('drafty', 'workbench_moderation', 'workbench_moderation_test'));
     parent::setUp($modules);
 
     // Create a new content type and enable moderation on it.
@@ -41,6 +41,17 @@ class WorkbenchModerationTestCase extends DrupalWebTestCase {
     ));
   }
 
+  /**
+   * Override DrupalWebTestCase::drupalGetToken() as it does not return the
+   * correct token for the currently logged-in testing user.
+   */
+  protected function drupalGetToken($value = '') {
+    $session_id = $this->session_id;
+    if (empty($session_id) && !empty($this->loggedInUser)) {
+      $session_id = db_query("SELECT sid FROM {sessions} WHERE uid = :uid ORDER BY timestamp DESC", array(':uid' => $this->loggedInUser->uid))->fetchField();
+    }
+    return drupal_hmac_base64($value, $session_id . drupal_get_private_key() . drupal_get_hash_salt());
+  }
 }
 
 class WorkbenchModerationModerateTabTestCase extends WorkbenchModerationTestCase {
@@ -56,18 +67,6 @@ class WorkbenchModerationModerateTabTestCase extends WorkbenchModerationTestCase
   function setUp($modules = array()) {
     parent::setUp($modules);
     $this->drupalLogin($this->moderator_user);
-  }
-
-  /**
-   * Override DrupalWebTestCase::drupalGetToken() as it does not return the
-   * correct token for the currently logged-in testing user.
-   */
-  protected function drupalGetToken($value = '') {
-    $session_id = $this->session_id;
-    if (empty($session_id) && !empty($this->loggedInUser)) {
-      $session_id = db_query("SELECT sid FROM {sessions} WHERE uid = :uid ORDER BY timestamp DESC", array(':uid' => $this->loggedInUser->uid))->fetchField();
-    }
-    return drupal_hmac_base64($value, $session_id . drupal_get_private_key() . drupal_get_hash_salt());
   }
 
   function testModerateTab() {
