@@ -25,7 +25,7 @@ function workbench_moderation_states_features_export_options() {
  * Process the features export array for states.
  */
 function workbench_moderation_states_features_export($data, &$export, $module_name) {
-  $export['dependencies']['workbench_moderation_states'] = 'workbench_moderation';
+  $export['dependencies']['workbench_moderation'] = 'workbench_moderation';
 
   foreach ($data as $component) {
     $export['features']['workbench_moderation_states'][$component] = $component;
@@ -100,7 +100,7 @@ function workbench_moderation_transitions_features_export_options() {
  * Process the features export array for transitions.
  */
 function workbench_moderation_transitions_features_export($data, &$export, $module_name) {
-  $export['dependencies']['workbench_moderation_transitions'] = 'workbench_moderation';
+  $export['dependencies']['workbench_moderation'] = 'workbench_moderation';
 
   foreach ($data as $component) {
     $export['features']['workbench_moderation_transitions'][$component] = $component;
