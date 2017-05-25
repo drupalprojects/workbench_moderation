@@ -221,8 +221,7 @@ class EntityOperations {
     if (!$this->moderationInfo->isLatestRevision($entity)) {
       return;
     }
-    /** @var ContentEntityInterface $entity */
-    if ($entity->isDefaultRevision()) {
+    if ($this->moderationInfo->isLiveRevision($entity)) {
       return;
     }
 
