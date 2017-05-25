@@ -18,7 +18,7 @@ class ModerationFormTest extends ModerationStateTestBase {
     $this->createContentTypeFromUI('Moderated content', 'moderated_content', TRUE, [
       'draft',
       'needs_review',
-      'published'
+      'published',
     ], 'draft');
     $this->grantUserPermissionToCreateContentOfType($this->adminUser, 'moderated_content');
   }
@@ -107,6 +107,27 @@ class ModerationFormTest extends ModerationStateTestBase {
     $this->assertResponse(200);
     $this->assertText('Status', 'Form text found on the latest-version page.');
     $this->assertText('Needs Review', 'Correct status found on the latest-version page.');
+  }
+
+  /**
+   * Tests the revision author is updated when the moderation form is used.
+   */
+  public function testModerationFormSetsRevisionAuthor() {
+    // Create new moderated content in published.
+    $node = $this->createNode(['type' => 'moderated_content', 'moderation_state' => 'published']);
+    // Make a forward revision.
+    $node->moderation_state->target_id = 'draft';
+    $node->save();
+
+    $another_user = $this->drupalCreateUser($this->permissions);
+    $this->grantUserPermissionToCreateContentOfType($another_user, 'moderated_content');
+    $this->drupalLogin($another_user);
+    $this->drupalPostForm(sprintf('node/%d/latest', $node->id()), [
+      'new_state' => 'needs_review',
+    ], t('Apply'));
+
+    $this->drupalGet(sprintf('node/%d/revisions', $node->id()));
+    $this->assertText('by ' . $another_user->getAccountName());
   }
 
 }
