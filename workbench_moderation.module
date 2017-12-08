@@ -102,6 +102,11 @@ function workbench_moderation_menu_alter(&$items) {
   $items['node/%node/revisions/%/view']['file'] = 'workbench_moderation.node.inc';
   $items['node/%node/revisions/%/view']['access callback'] = 'workbench_moderation_revision_access';
 
+  // Use our access control for the entity_translation path handling if set.
+  if (isset($items['node/%node/revisions/%state_flow_revision_node'])) {
+    $items['node/%node/revisions/%state_flow_revision_node']['access callback'] = 'workbench_moderation_revision_access';
+  }
+
   // Redirect node/%node/workflow
   if (!empty($items['node/%node/workflow']) && $items['node/%node/workflow']['module'] === 'state_flow') {
     // @todo, Uncomment this when the moderation tab is ready.
